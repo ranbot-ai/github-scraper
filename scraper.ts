@@ -31,9 +31,9 @@ async function scrapeGitHubOrg(orgName: string) {
     orgInfo.repositories = await scrapeAllRepos(orgName, page);
     orgInfo.totalRepositoriesCount = orgInfo.repositories.length;
 
-    console.log("Organization Info with Repos:", orgInfo);
+    console.log("// Organization Info with Repos:", orgInfo);
   } catch (error) {
-    console.error("Error scraping GitHub:", error);
+    console.error("// Error scraping GitHub:", error);
   } finally {
     await browser.close();
   }
@@ -45,9 +45,6 @@ async function getOrgInfo(orgName: string, page: Page): Promise<OrgInfo> {
   });
 
   return await page.evaluate(() => {
-    const cleanText = (el?: Element | null) =>
-      el?.textContent?.replace(/\s+/g, " ").trim();
-
     const name =
       document
         .querySelector("div.application-main main header h1")
@@ -125,7 +122,7 @@ async function scrapeAllRepos(
       }
     );
 
-    console.log(`Scraping page ${pageNumber}...`);
+    console.log(`// Scraping page ${pageNumber}...`);
 
     const pageRepos = await page.evaluate((): RepoData[] => {
       const cleanText = (el?: Element | null) =>
@@ -167,7 +164,7 @@ async function scrapeAllRepos(
     }
   }
 
-  console.log(`Total repositories scraped: ${allRepos.length}`);
+  console.log(`// Total repositories scraped: ${allRepos.length}`);
   return allRepos;
 }
 
@@ -176,5 +173,5 @@ const orgName = process.env.ORG_NAME;
 if (orgName) {
   scrapeGitHubOrg(orgName);
 } else {
-  console.error("ORG_NAME environment variable is not defined.");
+  console.error("// ORG_NAME environment variable is not defined.");
 }

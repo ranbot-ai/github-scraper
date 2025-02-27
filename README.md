@@ -21,12 +21,7 @@ This project is a GitHub scraper that uses Puppeteer to extract information abou
 1. Set the `ORG_NAME` environment variable to the GitHub organization you want to scrape:
 
    ```bash
-   export ORG_NAME=your-organization-name
-   ```
-
-2. Run the scraper:
-   ```bash
-   npm start
+   env ORG_NAME=ranbot-ai npx ts-node scraper.ts
    ```
 
 ## Features
