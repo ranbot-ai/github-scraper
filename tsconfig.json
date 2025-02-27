@@ -1,6 +1,6 @@
 {
   "compilerOptions": {
-    "target": "es6",
+    "target": "es2017",
     "module": "commonjs",
     "lib": ["es6", "dom"],
     "strict": true,
@@ -8,5 +8,6 @@
     "skipLibCheck": true,
     "forceConsistentCasingInFileNames": true
   },
-  "include": ["scraper.ts"]
+  "include": ["src/index.ts", "src/**/*.ts"],
+  "exclude": ["node_modules"]
 }

@@ -1,6 +1,8 @@
 # GitHub Scraper
 
-This project is a GitHub scraper that uses Puppeteer to extract information about GitHub organizations and their repositories. It collects data such as organization details, top languages, and repository information.
+This project is a GitHub scraper that uses Puppeteer to extract information about GitHub organizations/users and their repositories.
+
+It collects data such as organization/user details, top languages, and repository information.
 
 ## Installation
 
@@ -18,15 +20,15 @@ This project is a GitHub scraper that uses Puppeteer to extract information abou
 
 ## Usage
 
-1. Set the `ORG_NAME` environment variable to the GitHub organization you want to scrape:
+1. Set the `PERMALINK` & `WITH_REPOS` environment variable to the GitHub organization/user you want to scrape:
 
    ```bash
-   env ORG_NAME=ranbot-ai npx ts-node scraper.ts
+   env PERMALINK=ranbot-ai WITH_REPOS=true npx ts-node scraper.ts
    ```
 
 ## Features
 
-- Extracts organization information including name, description, top languages, employee count, website, and social links.
+- Extracts organization/user information including name, description, top languages, employee count, website, and social links.
 - Scrapes repository data such as name, link, description, stars, forks, and pull requests.
 - Handles pagination to scrape multiple pages of repositories.
 

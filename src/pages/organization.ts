@@ -1,54 +1,31 @@
-import puppeteer, { Page } from "puppeteer";
+import { Page } from "puppeteer";
+import { IOrgInfo, IOrgRepoInfo } from "../../types";
 
-interface OrgInfo {
-  name: string;
-  description: string;
-  topLanguages: string[];
-  peopleCount: number;
-  followers: number;
-  location: string;
-  website: string;
-  socialLinks: string[];
-  repositories?: RepoData[];
-  totalRepositoriesCount?: number;
-}
+async function scrapeGitHubOrg(
+  page: Page,
+  orgName: string,
+  withRepositories: boolean
+) {
+  const orgInfo = await getOrgInfo(page);
 
-interface RepoData {
-  name: string;
-  link: string;
-  about?: string;
-  stars?: string;
-  forks?: string;
-  docsPulls?: string;
-}
-
-async function scrapeGitHubOrg(orgName: string) {
-  const browser = await puppeteer.launch({ headless: true });
-  const page = await browser.newPage();
-
-  try {
-    const orgInfo = await getOrgInfo(orgName, page);
+  if (withRepositories) {
     orgInfo.repositories = await scrapeAllRepos(orgName, page);
     orgInfo.totalRepositoriesCount = orgInfo.repositories.length;
-
-    console.log("// Organization Info with Repos:", orgInfo);
-  } catch (error) {
-    console.error("// Error scraping GitHub:", error);
-  } finally {
-    await browser.close();
   }
+
+  console.log("// Organization Info with Repos:", orgInfo);
 }
 
-async function getOrgInfo(orgName: string, page: Page): Promise<OrgInfo> {
-  await page.goto(`https://github.com/${orgName}`, {
-    waitUntil: "networkidle2",
-  });
-
+async function getOrgInfo(page: Page): Promise<IOrgInfo> {
   return await page.evaluate(() => {
     const name =
       document
         .querySelector("div.application-main main header h1")
         ?.textContent?.trim() || "";
+    const picImageURL =
+      document
+        .querySelector("div.application-main main header img")
+        ?.getAttribute("src") || "";
     const description =
       document
         .querySelector("div.application-main main header h1 + div div")
@@ -93,6 +70,7 @@ async function getOrgInfo(orgName: string, page: Page): Promise<OrgInfo> {
 
     return {
       name,
+      picImageURL,
       description,
       topLanguages,
       followers,
@@ -107,8 +85,8 @@ async function getOrgInfo(orgName: string, page: Page): Promise<OrgInfo> {
 async function scrapeAllRepos(
   orgName: string,
   page: Page
-): Promise<RepoData[]> {
-  const allRepos: RepoData[] = [];
+): Promise<IOrgRepoInfo[]> {
+  const allRepos: IOrgRepoInfo[] = [];
   let pageNumber = 1;
   const MAX_PAGES = 50;
 
@@ -122,9 +100,9 @@ async function scrapeAllRepos(
       }
     );
 
-    console.log(`// Scraping page ${pageNumber}...`);
+    console.log(`// Scraping repositories with page ${pageNumber}...`);
 
-    const pageRepos = await page.evaluate((): RepoData[] => {
+    const pageRepos = await page.evaluate((): IOrgRepoInfo[] => {
       const cleanText = (el?: Element | null) =>
         el?.textContent?.replace(/\s+/g, " ").trim();
 
@@ -133,7 +111,12 @@ async function scrapeAllRepos(
       ).map((repo) => ({
         name: cleanText(repo.querySelector("h4 a")) || "",
         link: repo.querySelector("h4 a")?.getAttribute("href") || "",
-        about: cleanText(repo.querySelector('div[class^="Description-"]')),
+        description:
+          cleanText(repo.querySelector('div[class^="Description-"]')) || "",
+        programmingLanguage:
+          cleanText(
+            repo.querySelector('span[itemprop="programmingLanguage"]')
+          ) || "",
         stars: cleanText(repo.querySelector('a[href$="/stargazers"]')),
         forks: cleanText(repo.querySelector('a[href$="/forks"]')),
         docsPulls: cleanText(repo.querySelector('a[href$="/docs/pulls"]')),
@@ -168,10 +151,4 @@ async function scrapeAllRepos(
   return allRepos;
 }
 
-// Example usage
-const orgName = process.env.ORG_NAME;
-if (orgName) {
-  scrapeGitHubOrg(orgName);
-} else {
-  console.error("// ORG_NAME environment variable is not defined.");
-}
+export { scrapeGitHubOrg };
