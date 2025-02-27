@@ -23,7 +23,8 @@ It collects data such as organization/user details, top languages, and repositor
 1. Set the `PERMALINK` & `WITH_REPOS` environment variable to the GitHub organization/user you want to scrape:
 
    ```bash
-   env PERMALINK=ranbot-ai WITH_REPOS=true npx ts-node scraper.ts
+   env PERMALINK=ranbot-ai WITH_REPOS=true npx ts-node src/index.ts
+   env PERMALINK=encoreshao WITH_REPOS=true npx ts-node src/index.ts
    ```
 
 ## Features
